@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday! 🎉</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ccc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot.active {
+            background: #667eea;
+            transform: scale(1.5);
+        }
+
+        /* Page Container */
+        .page-container {
+            min-height: 100vh;
+            display: none;
+            padding-top: 60px;
+        }
+
+        .page-container.active {
+            display: block;
+        }
+
+        /* Album Page - Carousel */
+        .album-page {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 60px);
+        }
+
+        .album-title {
+            text-align: center;
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .carousel-wrapper {
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            background: white;
+            cursor: pointer;
+        }
+
+        /* ========================================
+           *** IMAGE FIT STYLES ADDED HERE ***
+           ========================================
+        */
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            /* 'cover' ensures the image fills the slide, cropping as necessary */
+            object-fit: cover; 
+            /* Removes any default spacing below inline elements */
+            display: block; 
+        }
+
+        .carousel-slide {
+            /* We need to define the height/dimensions of the slide to contain the image */
+            min-width: 100%;
+            background: white;
+            cursor: pointer;
+            
+            /* Setting a fixed height here is often necessary for image fitting */
+            height: 400px; /* **Adjust this height to your desired carousel picture size** */
+            overflow: hidden; /* Crucial to hide cropped parts of the image */
+            position: relative; /* If you plan to position captions over the image */
+        }
+        /* ========================================
+           *** END IMAGE FIT STYLES ***
+           ========================================
+        */
+
+        .photo-placeholder {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6rem;
+        }
+
+        .photo-caption {
+            padding: 1.5rem;
+            text-align: center;
+            color: #333;
+            font-weight: 500;
+            font-size: 1.2rem;
+        }
+
+        .carousel-controls {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 1rem;
+            pointer-events: none;
+        }
+
+        .carousel-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            pointer-events: all;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carousel-btn:hover {
+            background: white;
+            transform: scale(1.1);
+        }
+
+        .carousel-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .carousel-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator.active {
+            background: white;
+            transform: scale(1.3);
+        }
+
+        .carousel-counter {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+
+        /* Video Pages */
+        .video-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .video-container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        .video-title {
+            text-align: center;
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+            background: #000;
+        }
+
+        .video-wrapper video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .video-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+
+        /* Final Page */
+        .final-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .birthday-message {
+            background: white;
+            border-radius: 30px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            animation: fadeInUp 1s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .avatar {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin: 0 auto 2rem;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .birthday-text {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .birthday-subtext {
+            font-size: 1.5rem;
+            color: #666;
+            margin-top: 1rem;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f0f;
+            position: absolute;
+            animation: confetti-fall 3s linear infinite;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .album-title {
+                font-size: 2rem;
+            }
+
+            .photo-placeholder {
+                height: 300px;
+                font-size: 4rem;
+            }
+
+            .birthday-text {
+                font-size: 2.5rem;
+            }
+
+            .avatar {
+                width: 150px;
+                height: 150px;
+                font-size: 4rem;
+            }
+
+            .nav {
+                padding: 1rem;
+                gap: 1rem;
+            }
+
+            .carousel-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            
+            /* Adjust the slide height for smaller screens */
+            .carousel-slide {
+                height: 300px; /* Smaller height on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Dots -->
+    <div class="nav">
+        <div class="nav-dot active" data-page="0"></div>
+        <div class="nav-dot" data-page="1"></div>
+        <div class="nav-dot" data-page="2"></div>
+        <div class="nav-dot" data-page="3"></div>
+    </div>
+
+    <!-- Page 1: Photo Carousel -->
+        <div class="page-container active" id="page-0">
+        <div class="album-page">
+            <h1 class="album-title">🎂 Ảnh Đẹp Nè!! 🎂</h1>
+            
+            <div class="carousel-container">
+                <div class="carousel-wrapper">
+                    <div class="carousel-track" id="carouselTrack">
+                        <div class="carousel-slide" data-index="0">  
+                            <img class="photo-caption" src="1.jpg" alt="Photo 1">
+                            <div class="photo-caption">Album #1</div>
+                        </div>
+                        <div class="carousel-slide" data-index="1">
+                            <div class="photo-placeholder">🎉</div>
+                            <div class="photo-caption"></div>
+                        </div>
+                        <div class="carousel-slide" data-index="2">
+                            <img class="photo-caption" src="2.jpg" alt="Photo 2">
+                            <div class="photo-caption">Unforgettable Day #3</div>
+                        </div>
+                        <div class="carousel-slide" data-index="3">
+                            <div class="photo-placeholder">🎉</div>
+                            <div class="photo-caption"></div>
+                        </div>
+                        <div class="carousel-slide" data-index="4">
+                            
+                            <img class="photo-caption" src="3.jpg" alt="Photo 3">
+                            <div class="photo-caption"></div>
+                        </div>
+                        <div class="carousel-slide" data-index="5">
+                            <div class="photo-placeholder">🎉</div>
+                            <div class="photo-caption"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="carousel-indicators" id="indicators"></div>
+                <div class="carousel-counter" id="counter">1 / 6</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 4: Final Birthday Message -->
+    <div class="page-container" id="page-3">
+        <div class="final-page">
+            <div class="birthday-message">
+                <div class="avatar">
+                    <img src="grandpa.png" alt="Grandpa" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                </div>
+                <h1 class="birthday-text">Chúc Mừng Sinh Nhật Mẹ!</h1>
+                <p class="birthday-subtext">🎈✨</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Carousel state
+        let currentSlide = 0;
+        const totalSlides = 6;
+        const track = document.getElementById('carouselTrack');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const counter = document.getElementById('counter');
+        const indicatorsContainer = document.getElementById('indicators');
+
+        // Page navigation state
+        let currentPage = 0;
+        const totalPages = 4;
+        const pages = document.querySelectorAll('.page-container');
+        const navDots = document.querySelectorAll('.nav-dot');
+        let videosWatched = [];
+
+        // Initialize carousel indicators
+        function initCarousel() {
+            for (let i = 0; i < totalSlides; i++) {
+                const indicator = document.createElement('div');
+                indicator.className = 'indicator';
+                if (i === 0) indicator.classList.add('active');
+                indicator.addEventListener('click', () => goToSlide(i));
+                indicatorsContainer.appendChild(indicator);
+            }
+            updateCarousel();
+        }
+
+        // Update carousel position
+        function updateCarousel() {
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            counter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+            
+            // Update indicators
+            document.querySelectorAll('.indicator').forEach((ind, i) => {
+                ind.classList.toggle('active', i === currentSlide);
+            });
+            
+            // Update buttons
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+        }
+
+        // Navigate to specific slide
+        function goToSlide(index) {
+            currentSlide = index;
+            updateCarousel();
+        }
+
+        // Next slide
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateCarousel();
+            } else {
+                // Last image clicked, go to first video
+                showPage(1);
+            }
+        }
+
+        // Previous slide
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateCarousel();
+            }
+        }
+
+        // Click on slide to advance
+        document.querySelectorAll('.carousel-slide').forEach((slide) => {
+            slide.addEventListener('click', () => {
+                nextSlide();
+            });
+        });
+
+        // Button event listeners
+        prevBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            prevSlide();
+        });
+
+        nextBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            nextSlide();
+        });
+
+        // Keyboard navigation for carousel
+        document.addEventListener('keydown', (e) => {
+            if (currentPage === 0) {
+                if (e.key === 'ArrowRight') {
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                }
+            }
+        });
+
+        // Page navigation functions
+        function showPage(pageIndex) {
+            pages.forEach((page, index) => {
+                page.classList.toggle('active', index === pageIndex);
+            });
+            
+            navDots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === pageIndex);
+            });
+            
+            currentPage = pageIndex;
+            
+            // Auto-play video when entering video pages
+            if (pageIndex === 1 || pageIndex === 2) {
+                autoPlayVideo(pageIndex);
+            }
+            
+            // Add confetti on final page
+            if (pageIndex === 3) {
+                createConfetti();
+            }
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // Auto-play video functionality
+        function autoPlayVideo(pageIndex) {
+            const videoId = pageIndex === 1 ? 'video1' : 'video2';
+            const video = document.getElementById(videoId);
+            
+            if (video && !videosWatched.includes(videoId)) {
+                video.play().catch(e => {
+                    console.log('Autoplay prevented:', e);
+                });
+                
+                // Listen for video end to auto-advance
+                video.addEventListener('ended', function() {
+                    videosWatched.push(videoId);
+                    setTimeout(() => {
+                        if (pageIndex < totalPages - 1) {
+                            showPage(pageIndex + 1);
+                        }
+                    }, 1000);
+                }, { once: true });
+            }
+        }
+
+        // Navigation dot click handlers
+        navDots.forEach((dot) => {
+            dot.addEventListener('click', function() {
+                const pageIndex = parseInt(this.dataset.page);
+                showPage(pageIndex);
+            });
+        });
+
+        // Confetti animation
+        function createConfetti() {
+            const colors = ['#f093fb', '#f5576c', '#667eea', '#764ba2', '#ffd700', '#ff69b4'];
+            const confettiCount = 50;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 3 + 's';
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 5000);
+                }, i * 100);
+            }
+        }
+
+        // Initialize carousel on load
+        initCarousel();
+    </script>
+</body>
+</html>
